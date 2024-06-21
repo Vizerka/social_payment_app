@@ -1,0 +1,20 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+<h1>Dodaj beneficjentów do {{ payment_list.name }}</h1>
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Dodaj beneficjenta</button>
+</form>
+<a href="{% url 'frontend:payment_list_all' %}">Zakończ dodawanie beneficjentów</a>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+
+<script>
+    $(document).ready(function() {
+        $('select').select2();
+    });
+</script>
+{% endblock %}

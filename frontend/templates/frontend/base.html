@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Strona</title>
+        {% load static %}
+        <link href="{% static 'css/style.css' %}" rel="stylesheet" />
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+    </head>
+    <body class="body">
+        <header class="header">
+            <div class="navbar">
+                <a href="{% url 'frontend:index' %}">Strona główna</a>
+                <a href="{% url 'frontend:payment_add' %}">Utwórz liste wypłat</a>
+                <a href="{% url 'frontend:beneficiary_list' %}">Lista beneficjentów</a> 
+                <a href="{% url 'frontend:payment_list_all' %}">Wszystkie listy wypłat</a>
+                    {% if user.is_authenticated %}
+                    <p>Witaj, {{ user.username }}.</p>
+                    {% else %}
+                    <a href='{% url 'login' %}'>Zaloguj</a>
+                    {% endif %}
+                    {% if user.is_authenticated %}
+                    <form action="{% url 'logout' %}" method="post">
+                    {% csrf_token %}
+                    <button name="submit">Wyloguj</button>
+                    </form>
+                    {% endif %}
+
+            </div> 
+        </header>
+        <div class="maindiv">
+            {% block content %}
+            {% endblock content %}
+        </div>
+
+        <footer class="footer">
+            <p>Autorką aplikacji jest Wiktoria Vizera Kowalska</p>
+        </footer> 
+    </body>
+</html>

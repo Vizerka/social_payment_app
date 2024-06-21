@@ -1,0 +1,11 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+
+<p>Dodaj nowego beneficjenta</p>
+<form  method='post' style="border-style:dotted; border-color: purple; border-radius: 3px;">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button name="submit">Dodaj beneficjenta</button>
+</form>
+{% endblock content %}

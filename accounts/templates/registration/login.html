@@ -1,0 +1,15 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+  
+    {% if form.errors %}
+    <p>Nazwa użytkownika lub hasło są nieprawidłowe</p>
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+    {% csrf_token %}
+    {{ form.as_div }}
+
+    <button name="submit">Zaloguj</button>
+    </form>
+{% endblock content %}

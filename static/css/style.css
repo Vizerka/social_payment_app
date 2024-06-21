@@ -1,0 +1,115 @@
+html *{
+    font-family: calibri;
+}
+.body {
+    --main-bg-color: rgba(255, 119, 255, 0.5);
+  }
+.navbar{
+    overflow: hidden;
+    background-color: var(--main-bg-color);
+    position:fixed;
+    top:0;
+    width:100%
+}
+.navbar a{
+    float:left;
+    display:block;
+    color:rgb(0, 0, 0);
+    text-align: center;
+    padding:14px 16px;
+    text-decoration:none;
+}
+.navbar a:hover{
+    background:rgb(255, 255, 255);
+    color:rgb(0, 0, 0);
+}
+.navbar p{
+    float:right;
+    display:block;
+    color:rgb(0, 0, 0);
+    text-align: center;
+    text-decoration:none;
+    margin-right: 20px;
+    margin-bottom:0;
+}
+.body{
+    margin:0; 
+    padding:0; 
+    background-image: url("https://storage.opinieouczelniach.pl/cache/profession/1/US8IQsaTWESTb4_2lKTUE3SfHThvY_n4.jpeg");
+    background-repeat: no-repeat;
+    background-size:cover;
+}
+.header{
+    position: relative; 
+    height: 80px; 
+    width: 100%
+}
+.header button{
+    float:right;
+    margin-top: 15px;
+    margin-right: 15px;
+}
+.maindiv{
+    position:relative; 
+    width:100%;
+    height: 300px;
+    margin: 0 auto;
+    background-color: rgba(255,255,255,0.5); 
+    text-align: center; 
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+.beneficiary_list{
+    width: 60%;
+    margin: 0 auto; 
+    position:relative; 
+    height:100%; 
+    text-align: justify;  
+}
+.beneficiary_list ul{
+    list-style-type: none;
+    width: 100%;
+    margin: 0 auto;
+    background-color: rgba(255,255,255,0.5);
+    overflow-y:scroll;
+    height:200px;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+.beneficiary_list li{
+}
+.beneficiary_list li:hover{
+    font-weight: bold;
+}
+.beneficiary_list li:nth-child(even){
+    color: rgb(255, 203, 203);
+    background-color: rgb(255, 255, 255);
+}
+.beneficiary_list li:nth-child(odd){
+    color:white;
+    background-color: rgb(160, 160, 160);
+}
+.beneficiary_add a{
+    float:left;
+    display:block;
+    margin-top:5px;
+    background: rgba(255,255,255,0.5);
+    color:rgb(0, 0, 0);
+    text-align: center;
+    padding:14px 16px;
+    text-decoration:none;
+}
+.beneficiary_add a:hover{
+    background:rgb(255, 255, 255);
+    color:rgb(0, 0, 0)
+}
+.footer{
+    position: absolute; 
+    width:100%; 
+    bottom:0; 
+    background-color: var(--main-bg-color);
+}
+.footer p{
+    margin:0 auto;
+    text-align: center;
+}

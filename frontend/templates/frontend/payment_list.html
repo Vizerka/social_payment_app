@@ -1,0 +1,10 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+    <h1>Listy wypłat</h1>
+    <div class="payment_list">
+        {% for payment in payments %}
+                <a href="{% url 'frontend:payment_detail' payment.pk %}"><table style="margin:auto;" border="1"><tr><td>{{ payment.name }}</td><td>{{ payment.date_added }}</td></tr></table></a>
+        {% endfor %}
+    </div> 
+{% endblock content %}
