@@ -1,5 +1,5 @@
 from django.contrib import admin # type: ignore # type: ignore
-from .models import Beneficiary, PaymentList, PaymentHistory
+from .models import Beneficiary, PaymentList, PaymentHistory, PaymentListBeneficiary
 
 admin.site.register(Beneficiary)
 admin.site.register(PaymentList)

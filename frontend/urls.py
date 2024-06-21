@@ -13,4 +13,5 @@ urlpatterns = [
     path('beneficiary/add/', views.beneficiary_add, name='beneficiary_add'),
     path('payment_list_all', views.payment_list, name='payment_list_all'),
     path('payment_detail/<int:pk>/', views.payment_detail, name='payment_detail'),
+    path('export_payment_list_to_excel/<int:pk>/', views.export_payment_list_to_excel, name='export_payment_list_to_excel'),
 ]

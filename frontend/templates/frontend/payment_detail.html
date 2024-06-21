@@ -5,10 +5,11 @@
     <h1>{{ payment.name }}</h1>
     <h2>Lista Osób na tej liście </h2>
     <table style="margin: auto;" border="1">
-        <tr><td>Imię</td>  <td>Nazwisko</td><td>Placówka</td><td>Kwota</td></tr>
+        <tr><td>Imię</td>  <td>Nazwisko</td><td>Nr konta bankowegoooooooooo</td><td>Placówka</td><td>Kwota</td></tr>
         {% for entry in beneficiaries %}
-        <tr><td>{{ entry.first_name }}</td>  <td>{{ entry.last_name }}</td><td>{{ entry.place }}</td><td>{{ entry.amount }}</td></tr>
+        <tr><td>{{ entry.first_name }}</td>  <td>{{ entry.last_name }}</td><td>{{ entry.bank_account_number }}</td><td>{{ entry.place }}</td><td>{{ entry.amount }}</td></tr>
          {% endfor %}
     </table>
+    <a href="{% url 'frontend:export_payment_list_to_excel' payment.pk %}">Export to Excel</a>
 </div>
 {% endblock content %}
