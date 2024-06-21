@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect # type: ignore
 from .models import Beneficiary, PaymentList, PaymentHistory, PaymentListBeneficiary
-from .forms import BeneficiaryForm, PaymentListForm, NewBeneficiaryForm, PaymentListBeneficiaryForm
+from .forms import BeneficiaryForm, PaymentListForm, NewBeneficiaryForm, PaymentListBeneficiaryForm, UploadFileForm
 from django.db.models import Q # type: ignore
 from django.core.paginator import Paginator  # type: ignore # Import Paginator
 from django.contrib.auth.decorators import login_required # type: ignore
@@ -10,6 +10,7 @@ import openpyxl
 from openpyxl.utils import get_column_letter
 from django.http import HttpResponse
 from io import BytesIO
+from django.contrib import messages
 
 def index(request): #zdefiniowanie strony index
     return render(request, 'frontend/index.html')
@@ -17,24 +18,22 @@ def logout(request):
     return render(request, 'frontend/logout.html')
 
 @login_required
-def beneficiary_list(request): #zdefiniowanie strony z listą beneficjentów 
-    #funkcja dla wyszukiwania beneficjentów po Imieniu lub Nazwisku lub Placówce
-    query = request.GET.get('Q') 
-    if query: 
+def beneficiary_list(request):
+    query = request.GET.get('q')
+    if query:
         beneficiaries = Beneficiary.objects.filter(
-            Q(first_name__icontains=query) | Q(last_name__icontains=query) | Q(place__icontains=query)
+            Q(first_name__icontains=query) | 
+            Q(last_name__icontains=query) | 
+            Q(place__icontains=query)
         )
-        paginator = Paginator(beneficiaries, 5)  # 50 wpisów na stronę
-        page_number = request.GET.get('page')
     else:
-        #w przypadku braku podania danych w formularzu zostanie wyświetlona pełna baza
         beneficiaries = Beneficiary.objects.all()
-    # Paginacja
-    paginator = Paginator(beneficiaries, 5)  # 50 wpisów na stronę
+    
+    paginator = Paginator(beneficiaries, 50)  # 50 beneficjentów na stronę
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
-    return render(request, 'frontend/beneficiary_list.html', {'beneficiaries':beneficiaries, 'page_obj': page_obj})
-
+    
+    return render(request, 'frontend/beneficiary_list.html', {'page_obj': page_obj})
 @login_required
 def beneficiary_add(request): #zdefiniowanie manualnego dodawania użytkowników 
     if request.method != 'POST':
@@ -139,7 +138,7 @@ def export_payment_list_to_excel(request, pk):
     worksheet.title = payment_list.name
 
     # Define the titles for columns
-    columns = ['imie i nazwisko', 'nr konta', 'placówka', 'kwota']
+    columns = ['rachunek obcy', 'nr konta', 'imie i nazwisko', 'kwota', 'Tytuł', 'data']
     row_num = 1
 
     # Assign the titles for each cell of the header
@@ -150,15 +149,17 @@ def export_payment_list_to_excel(request, pk):
     # Fill the worksheet with data
     for plb in payment_list_beneficiaries:
         row_num += 1
-        worksheet.cell(row=row_num, column=1, value=f"{plb.beneficiary.first_name} {plb.beneficiary.last_name}")
+        worksheet.cell(row=row_num, column=1, value=f"9512401037111001109117246")
+        worksheet.cell(row=row_num, column=3, value=f"{plb.beneficiary.first_name} {plb.beneficiary.last_name}")
         worksheet.cell(row=row_num, column=2, value=plb.beneficiary.bank_account_number)
-        worksheet.cell(row=row_num, column=3, value=plb.beneficiary.place)
+        worksheet.cell(row=row_num, column=5, value=f"{plb.beneficiary.place} {payment_list.name}")
         worksheet.cell(row=row_num, column=4, value=plb.amount)
+        worksheet.cell(row=row_num, column=6, value=payment_list.date_added)
 
     # Adjust column widths
     for col_num, column_title in enumerate(columns, 1):
         column_letter = get_column_letter(col_num)
-        worksheet.column_dimensions[column_letter].width = 15
+        worksheet.column_dimensions[column_letter].width = 20
 
     # Save the workbook to a bytes buffer
     buffer = BytesIO()
@@ -174,4 +175,38 @@ def export_payment_list_to_excel(request, pk):
 
     return response
 
+@login_required
+def import_beneficiaries(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['file']
+            wb = openpyxl.load_workbook(file)
+            sheet = wb.active
+            skipped_beneficiaries = []
+
+            for row in sheet.iter_rows(min_row=2, values_only=True):
+                first_name, last_name, place, bank_account_number, payment_year = row
+                if Beneficiary.objects.filter(first_name=first_name, last_name=last_name, place=place).exists():
+                    skipped_beneficiaries.append(f'{first_name} {last_name} ({place})')
+                    continue
+
+                Beneficiary.objects.create(
+                    first_name=first_name,
+                    last_name=last_name,
+                    place=place,
+                    bank_account_number=bank_account_number,
+                    payment_year=payment_year
+                )
+
+            if skipped_beneficiaries:
+                messages.warning(request, f'Import przebiegł pomyślnie, pominięci zostali następujący beneficjenci: {", ".join(skipped_beneficiaries)}')
+            else:
+                messages.success(request, 'Pomyślnie zaimportowano wszystkich beneficjentów')
+
+            return redirect('frontend:beneficiary_list')
+    else:
+        form = UploadFileForm()
+
+    return render(request, 'frontend/import_beneficiaries.html', {'form': form})
 # Create your views here.

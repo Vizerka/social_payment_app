@@ -14,4 +14,5 @@ urlpatterns = [
     path('payment_list_all', views.payment_list, name='payment_list_all'),
     path('payment_detail/<int:pk>/', views.payment_detail, name='payment_detail'),
     path('export_payment_list_to_excel/<int:pk>/', views.export_payment_list_to_excel, name='export_payment_list_to_excel'),
+    path('import_beneficiaries/', views.import_beneficiaries, name='import_beneficiaries'),
 ]

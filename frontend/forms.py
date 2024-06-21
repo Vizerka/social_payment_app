@@ -38,3 +38,6 @@ class NewBeneficiaryForm(forms.ModelForm):
                      'bank_account_number': forms.TextInput(),
                      'payment_year':  forms.NumberInput(attrs={"min":2022, "max":2024,}),
                      }
+
+class UploadFileForm(forms.Form):
+    file = forms.FileField(label='Wybierz plik Excel')

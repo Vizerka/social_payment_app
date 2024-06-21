@@ -2,9 +2,19 @@
 
 {% block content %}
 <h1>Dodaj nową listę wypłat</h1>
-<form method="post">
+<form method="post" id="payment-list-form">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit">Zatwierdź</button>
+    <button type="submit">Dodaj listę wypłat</button>
 </form>
+
+<script>
+document.getElementById('payment-list-form').addEventListener('submit', function(event) {
+    var nameField = document.getElementById('id_name');
+    if (nameField.value.includes('/')) {
+        alert('Nazwa listy wypłat nie może zawierać znaku "/".');
+        event.preventDefault();
+    }
+});
+</script>
 {% endblock content %}

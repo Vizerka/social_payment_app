@@ -8,14 +8,32 @@
     </form>
     <div class="beneficiary_list">
     <ul >
-        {% for beneficiary in beneficiaries %}
+        {% for beneficiary in page_obj %}
             <li>
                 <a href="{% url 'frontend:beneficiary_detail' beneficiary.pk %}"><table border="1"><tr><td style="width:100px;">{{ beneficiary.first_name }}</td><td style="width:100px;">{{ beneficiary.last_name }}</td><td style="width:100px;">{{ beneficiary.place }}</td></tr></table></a>
             </li>
         {% endfor %}
     </ul>
+    <div class="pagination">
+        <span class="step-links">
+            {% if page_obj.has_previous %}
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page=1">&laquo; first</a>
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">previous</a>
+            {% endif %}
+    
+            <span class="current">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
+            </span>
+    
+            {% if page_obj.has_next %}
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">next</a>
+                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
     <div class="beneficiary_add">
         <a href="beneficiary/add">Dodaj nowego beneficjenta</a>
+        <a href="import_beneficiaries">Importuj z pliku</a>
     </div>
     </div> 
 {% endblock content %}
