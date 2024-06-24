@@ -3,14 +3,14 @@
 {% block content %}
     <h1>Beneficjenci </h1>
     <form method="GET" action="">
-        <input type="text" name="Q" placeholder="Szukaj...">
+        <input type="text" name="q" placeholder="Szukaj...">
         <button type="submit">Szukaj</button>
     </form>
     <div class="beneficiary_list">
     <ul >
         {% for beneficiary in page_obj %}
             <li>
-                <a href="{% url 'frontend:beneficiary_detail' beneficiary.pk %}"><table border="1"><tr><td style="width:100px;">{{ beneficiary.first_name }}</td><td style="width:100px;">{{ beneficiary.last_name }}</td><td style="width:100px;">{{ beneficiary.place }}</td></tr></table></a>
+                <a href="{% url 'frontend:beneficiary_detail' beneficiary.pk %}"><table border="1"><tr><td>{{ beneficiary.first_name }}</td><td>{{ beneficiary.last_name }}</td><td>{{ beneficiary.place }}</td></tr></table></a>
             </li>
         {% endfor %}
     </ul>
