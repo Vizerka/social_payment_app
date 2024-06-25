@@ -210,4 +210,18 @@ def import_beneficiaries(request):
         form = UploadFileForm()
 
     return render(request, 'frontend/import_beneficiaries.html', {'form': form})
+@login_required
+def beneficiary_edit(request, pk):
+    beneficiary = get_object_or_404(Beneficiary, pk=pk)
+    
+    if request.method == 'POST':
+        form = BeneficiaryForm(request.POST, instance=beneficiary)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Beneficjent został pomyślnie zaktualizowany.')
+            return redirect('frontend:beneficiary_detail', pk=beneficiary.pk)
+    else:
+        form = BeneficiaryForm(instance=beneficiary)
+    
+    return render(request, 'frontend/beneficiary_edit.html', {'form': form, 'beneficiary': beneficiary})
 # Create your views here.
