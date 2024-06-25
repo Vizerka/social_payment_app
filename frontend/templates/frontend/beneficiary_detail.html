@@ -5,6 +5,11 @@
     <h1>{{ beneficiary.first_name }} {{ beneficiary.last_name }}</h1>
     <p>Placówka: {{ beneficiary.place }}</p>
     <p>Nr Konta Bankowego: {{ beneficiary.bank_account_number }}</p>
+    {% if beneficiary.is_alive %}</p>
+    <p>żyż</p>
+    {% else %}
+    <p>Nie żyż</p>
+    {% endif %}
     <h2>Historia wypłat:</h2>
     <ul>
         {% for entry in payment_history %}

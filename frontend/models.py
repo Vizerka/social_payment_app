@@ -7,7 +7,8 @@ class Beneficiary(models.Model): #model dla beneficjenta programu socjalnego
     last_name = models.CharField(max_length=40)
     place = models.CharField(max_length=100)
     bank_account_number = models.CharField(max_length=26)
-    payment_year = models.IntegerField()
+    payment_year = models.IntegerField(default=2022)
+    is_alive = models.BooleanField(default=True)
 
     def __str__(self): 
         return f"{self.first_name} - {self.last_name} - {self.place} - {self.payment_year}" #zwrot f stringa 

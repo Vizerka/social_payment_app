@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta charset="UTF-8">
         <title>Strona</title>
         {% load static %}
@@ -30,14 +31,15 @@
 
             </div> 
         </header>
-        {% if messages %}
+    
+        <div class="maindiv">
+            {% if messages %}
         <ul class="messages">
             {% for message in messages %}
                 <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
             {% endfor %}
         </ul>
-        {% endif %}
-        <div class="maindiv">
+         {% endif %}
             {% block content %}
             {% endblock content %}
         </div>

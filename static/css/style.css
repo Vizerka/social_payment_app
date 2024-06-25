@@ -1,15 +1,12 @@
 html *{
     font-family: calibri;
 }
-.body {
-    --main-bg-color: rgba(255, 119, 255, 0.5);
-  }
 .navbar{
     overflow: hidden;
     background-color: var(--main-bg-color);
     position:fixed;
     top:0;
-    width:100%
+    width:100%;
 }
 .navbar a{
     float:left;
@@ -33,11 +30,13 @@ html *{
     margin-bottom:0;
 }
 .body{
+    --main-bg-color: rgba(255, 119, 255, 0.5);
     margin:0; 
     padding:0; 
     background-image: url("https://storage.opinieouczelniach.pl/cache/profession/1/US8IQsaTWESTb4_2lKTUE3SfHThvY_n4.jpeg");
     background-repeat: no-repeat;
     background-size:cover;
+    background-color: black;
 }
 .header{
     position: relative; 
@@ -50,29 +49,29 @@ html *{
     margin-right: 15px;
 }
 .maindiv{
-    position:relative; 
+    position: absolute; 
     width:100%;
-    height: 350px;
+    height: 82%;
     margin: 0 auto;
     background-color: rgba(255,255,255,0.5); 
     text-align: center; 
-    padding-top: 5%;
-    padding-bottom: 5%;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 .beneficiary_list{
-    width: 60%;
+    width: 50%;
     margin: 0 auto; 
     position:relative; 
-    height:100%; 
-    text-align: justify;  
+    text-align: justify;
 }
 .beneficiary_list ul{
+    position: relative;
+    height:300px;
     list-style-type: none;
     width: 100%;
     margin: 0 auto;
     background-color: rgba(255,255,255,0.5);
     overflow-y:scroll;
-    height:200px;
     padding-right: 10px;
     padding-left: 10px;
 }

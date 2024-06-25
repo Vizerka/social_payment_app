@@ -75,30 +75,31 @@ def payment_add(request):
         form = PaymentListForm()
     return render(request, 'frontend/payment_add.html', {'form': form})
 
-@login_required
 def payment_add_beneficiary(request, pk):
-    payment_list = PaymentList.objects.get(pk=pk)
+    payment_list = get_object_or_404(PaymentList, pk=pk)
     
     if request.method == 'POST':
         form = PaymentListBeneficiaryForm(request.POST)
         if form.is_valid():
             payment_beneficiary = form.save(commit=False)
-            payment_beneficiary.payment_list = payment_list  # Przypisanie payment_list tutaj
-            try:
-                if PaymentListBeneficiary.objects.filter(payment_list=payment_list, beneficiary=payment_beneficiary.beneficiary).exists():
-                    form.add_error('beneficiary', 'Ten beneficjent już istnieje na tej liście wypłat.')
-                else:
-                    payment_beneficiary.save()
-
-                    PaymentHistory.objects.create(
-                        beneficiary=payment_beneficiary.beneficiary,
-                        payment_list=payment_list,
-                        amount=payment_beneficiary.amount
-                    )
-
-                    return redirect('frontend:payment_add_beneficiary', pk=payment_list.pk)
-            except ValidationError as e:
-                form.add_error(None, e)
+            payment_beneficiary.payment_list = payment_list
+            
+            beneficiary = payment_beneficiary.beneficiary
+            
+            # Sprawdzenie, czy beneficjent jest żywy
+            if not beneficiary.is_alive:
+                form.add_error('beneficiary', 'Ten beneficjent nie żyje i nie może być dodany do listy wypłat.')
+            elif PaymentListBeneficiary.objects.filter(payment_list=payment_list, beneficiary=beneficiary).exists():
+                form.add_error('beneficiary', 'Ten beneficjent już istnieje na tej liście wypłat.')
+            else:
+                payment_beneficiary.save()
+                PaymentHistory.objects.create(
+                    beneficiary=beneficiary,
+                    payment_list=payment_list,
+                    amount=payment_beneficiary.amount
+                )
+                messages.success(request, f'Beneficjent {beneficiary} został dodany do listy wypłat.')
+                return redirect('frontend:payment_add_beneficiary', pk=payment_list.pk)
     else:
         form = PaymentListBeneficiaryForm()
     
