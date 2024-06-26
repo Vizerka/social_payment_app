@@ -5,15 +5,17 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget # type: ig
 class BeneficiaryForm(forms.ModelForm):
     class Meta:
         model = Beneficiary
-        fields = ['first_name', 'last_name', 'place', 'bank_account_number', 'payment_year', 'is_alive']
+        fields = ['first_name', 'last_name', 'place', 'bank_account_number', 'payment_year', 'is_alive', 'version']
         labels = {
             'first_name': 'Imię',
             'last_name': 'Nazwisko',
             'place': 'Placówka',
             'bank_account_number': 'Nr rachunku bankowego',
             'payment_year': 'Rok wypłaty',
-            'is_alive': 'Czy żyje',
+            'is_alive': 'Czy aktywny?',
         }
+        widgets = {'version': forms.HiddenInput()}
+    version = forms.IntegerField(widget=forms.HiddenInput())
 
 class PaymentListForm(forms.ModelForm):
     class Meta:

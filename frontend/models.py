@@ -1,4 +1,6 @@
 from django.db import models # type: ignore
+from simple_history.models import HistoricalRecords
+
 #Modele 
 
 class Beneficiary(models.Model): #model dla beneficjenta programu socjalnego
@@ -9,6 +11,8 @@ class Beneficiary(models.Model): #model dla beneficjenta programu socjalnego
     bank_account_number = models.CharField(max_length=26)
     payment_year = models.IntegerField(default=2022)
     is_alive = models.BooleanField(default=True)
+    version = models.PositiveIntegerField(default=0)
+    history = HistoricalRecords()
 
     def __str__(self): 
         return f"{self.first_name} - {self.last_name} - {self.place} - {self.payment_year}" #zwrot f stringa 

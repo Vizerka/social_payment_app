@@ -11,6 +11,7 @@ from openpyxl.utils import get_column_letter
 from django.http import HttpResponse
 from io import BytesIO
 from django.contrib import messages
+from django.db import transaction, IntegrityError
 
 def index(request): #zdefiniowanie strony index
     return render(request, 'frontend/index.html')
@@ -28,6 +29,9 @@ def beneficiary_list(request):
         )
     else:
         beneficiaries = Beneficiary.objects.all()
+
+    active_count = Beneficiary.objects.filter(is_alive=True).count()
+    inactive_count = Beneficiary.objects.filter(is_alive=False).count()
     
     paginator = Paginator(beneficiaries, 50)  # 50 beneficjentów na stronę
     page_number = request.GET.get('page')
@@ -217,11 +221,18 @@ def beneficiary_edit(request, pk):
     if request.method == 'POST':
         form = BeneficiaryForm(request.POST, instance=beneficiary)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Beneficjent został pomyślnie zaktualizowany.')
-            return redirect('frontend:beneficiary_detail', pk=beneficiary.pk)
+            with transaction.atomic():
+                if Beneficiary.objects.filter(pk=pk, version=form.cleaned_data['version']).exists():
+                    beneficiary = form.save(commit=False)
+                    beneficiary.version += 1
+                    beneficiary.save()
+                    messages.success(request, 'Beneficjent został pomyślnie zaktualizowany.')
+                    return redirect('frontend:beneficiary_detail', pk=beneficiary.pk)
+                else:
+                    form.add_error(None, 'Ten rekord został już zaktualizowany przez innego użytkownika.')
     else:
         form = BeneficiaryForm(instance=beneficiary)
+        form.fields['version'].initial = beneficiary.version
     
     return render(request, 'frontend/beneficiary_edit.html', {'form': form, 'beneficiary': beneficiary})
 # Create your views here.

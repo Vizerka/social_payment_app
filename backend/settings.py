@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'accounts',
     #aplikacje zewnętrzene 
     'django_select2',
+    'simple_history',
     #domyślne aplikacje django 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -48,6 +49,8 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'simple_history.middleware.HistoryRequestMiddleware',
+
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',

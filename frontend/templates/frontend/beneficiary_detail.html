@@ -6,9 +6,9 @@
     <p>Placówka: {{ beneficiary.place }}</p>
     <p>Nr Konta Bankowego: {{ beneficiary.bank_account_number }}</p>
     {% if beneficiary.is_alive %}</p>
-    <p>żyż</p>
+    <p>Beneficjent aktywny</p>
     {% else %}
-    <p>Nie żyż</p>
+    <p>Beneficjent nieaktywny</p>
     {% endif %}
     <h2>Historia wypłat:</h2>
     <ul>
