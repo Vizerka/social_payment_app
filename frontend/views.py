@@ -6,17 +6,15 @@ from django.core.paginator import Paginator  # type: ignore # Import Paginator
 from django.contrib.auth.decorators import login_required # type: ignore
 from django.forms import inlineformset_factory # type: ignore
 from django.core.exceptions import ValidationError # type: ignore
-import openpyxl
-from openpyxl.utils import get_column_letter
-from django.http import HttpResponse
+import openpyxl # type: ignore
+from openpyxl.utils import get_column_letter # type: ignore
+from django.http import HttpResponse # type: ignore
 from io import BytesIO
-from django.contrib import messages
-from django.db import transaction, IntegrityError
+from django.contrib import messages # type: ignore
+from django.db import transaction, IntegrityError # type: ignore
 
 def index(request): #zdefiniowanie strony index
     return render(request, 'frontend/index.html')
-def logout(request):
-    return render(request, 'frontend/logout.html')
 
 @login_required
 def beneficiary_list(request):
@@ -191,7 +189,7 @@ def import_beneficiaries(request):
             skipped_beneficiaries = []
 
             for row in sheet.iter_rows(min_row=2, values_only=True):
-                first_name, last_name, place, bank_account_number, payment_year = row
+                first_name, last_name, place, bank_account_number = row
                 if Beneficiary.objects.filter(first_name=first_name, last_name=last_name, place=place).exists():
                     skipped_beneficiaries.append(f'{first_name} {last_name} ({place})')
                     continue
@@ -200,9 +198,7 @@ def import_beneficiaries(request):
                     first_name=first_name,
                     last_name=last_name,
                     place=place,
-                    bank_account_number=bank_account_number,
-                    payment_year=payment_year
-                )
+                    bank_account_number=bank_account_number,)
 
             if skipped_beneficiaries:
                 messages.warning(request, f'Import przebiegł pomyślnie, pominięci zostali następujący beneficjenci: {", ".join(skipped_beneficiaries)}')

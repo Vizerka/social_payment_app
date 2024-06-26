@@ -1,6 +1,6 @@
 from django.contrib import admin # type: ignore # type: ignore
 from .models import Beneficiary, PaymentList, PaymentHistory, PaymentListBeneficiary
-from simple_history.admin import SimpleHistoryAdmin
+from simple_history.admin import SimpleHistoryAdmin # type: ignore
 
 admin.site.register(PaymentList)
 admin.site.register(PaymentHistory)

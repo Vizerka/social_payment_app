@@ -1,5 +1,5 @@
 from django.db import models # type: ignore
-from simple_history.models import HistoricalRecords
+from simple_history.models import HistoricalRecords # type: ignore
 
 #Modele 
 
@@ -9,13 +9,12 @@ class Beneficiary(models.Model): #model dla beneficjenta programu socjalnego
     last_name = models.CharField(max_length=40)
     place = models.CharField(max_length=100)
     bank_account_number = models.CharField(max_length=26)
-    payment_year = models.IntegerField(default=2022)
     is_alive = models.BooleanField(default=True)
     version = models.PositiveIntegerField(default=0)
     history = HistoricalRecords()
 
     def __str__(self): 
-        return f"{self.first_name} - {self.last_name} - {self.place} - {self.payment_year}" #zwrot f stringa 
+        return f"{self.first_name} - {self.last_name} - {self.place}" #zwrot f stringa 
     
 class PaymentList(models.Model): #model dla listy wypłat
     name = models.CharField(max_length=150) #nazwa listy wypłat

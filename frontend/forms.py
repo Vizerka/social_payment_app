@@ -5,13 +5,12 @@ from django_select2.forms import Select2MultipleWidget, Select2Widget # type: ig
 class BeneficiaryForm(forms.ModelForm):
     class Meta:
         model = Beneficiary
-        fields = ['first_name', 'last_name', 'place', 'bank_account_number', 'payment_year', 'is_alive', 'version']
+        fields = ['first_name', 'last_name', 'place', 'bank_account_number', 'is_alive', 'version']
         labels = {
             'first_name': 'Imię',
             'last_name': 'Nazwisko',
             'place': 'Placówka',
             'bank_account_number': 'Nr rachunku bankowego',
-            'payment_year': 'Rok wypłaty',
             'is_alive': 'Czy aktywny?',
         }
         widgets = {'version': forms.HiddenInput()}
@@ -35,18 +34,16 @@ class PaymentListBeneficiaryForm(forms.ModelForm):
 class NewBeneficiaryForm(forms.ModelForm):
      class Meta:
           model = Beneficiary
-          fields = ['first_name', 'last_name', 'place', 'bank_account_number', 'payment_year']
+          fields = ['first_name', 'last_name', 'place', 'bank_account_number',]
           labels = {'first_name': 'Imię',
                     'last_name': 'Nazwisko', 
                     'place': 'Placówka', 
                     'bank_account_number':'Nr Konta Bankowego', 
-                    'payment_year':'Rok Wpłaty'
                     }
           widgets = {'first_name': forms.TextInput(),
                      'last_name': forms.TextInput(),
                      'place':  forms.TextInput(),
                      'bank_account_number': forms.TextInput(),
-                     'payment_year':  forms.NumberInput(attrs={"min":2022, "max":2024,}),
                      }
 
 class UploadFileForm(forms.Form):
