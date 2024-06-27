@@ -15,25 +15,20 @@
         {% endfor %}
     </ul>
     </div>
-    <div class="pagination">
-        <span class="step-links">
-            {% if page_obj.has_previous %}
-                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page=1">&laquo; Pierwsza</a>
-                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">Poprzednia</a>
-            {% endif %}
-    
-            <span class="current">
-                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}.
-            </span>
-    
-            {% if page_obj.has_next %}
-                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">Następna</a>
-                <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Ostatnia&raquo;</a>
-            {% endif %}
-        </span>
-    </div> 
     <div class="beneficiary_add">
+        {% if page_obj.has_previous %}
+            <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page=1">&laquo; Pierwsza</a>
+            <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.previous_page_number }}">Poprzednia</a>
+        {% endif %}
+        <a>Strona {{ page_obj.number }} z {{ page_obj.paginator.num_pages }}.</a>
+        {% if page_obj.has_next %}
+            <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.next_page_number }}">Następna</a>
+            <a href="?{% if request.GET.q %}q={{ request.GET.q }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Ostatnia&raquo;</a>
+        {% endif %}
         <a href="beneficiary/add">Dodaj nowego beneficjenta</a>
         <a href="import_beneficiaries">Importuj z pliku</a>
+        <a>Aktywni beneficjenci:{{ active_count }}</a>
+        <a>Nieaktywni {{ inactive_count }}</a>
+        
     </div>
 {% endblock content %}

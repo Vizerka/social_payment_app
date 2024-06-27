@@ -35,7 +35,8 @@ def beneficiary_list(request):
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
     
-    return render(request, 'frontend/beneficiary_list.html', {'page_obj': page_obj})
+    return render(request, 'frontend/beneficiary_list.html', {'page_obj': page_obj, 'active_count':active_count, 'inactive_count':inactive_count})
+
 @login_required
 def beneficiary_add(request): #zdefiniowanie manualnego dodawania użytkowników 
     if request.method != 'POST':
