@@ -1,6 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect # type: ignore
-from .models import Beneficiary, PaymentList, PaymentHistory, PaymentListBeneficiary
-from .forms import BeneficiaryForm, PaymentListForm, NewBeneficiaryForm, PaymentListBeneficiaryForm, UploadFileForm
+from .models import Beneficiary, PaymentList, PaymentHistory, PaymentListBeneficiary, Application, Benefit, ApplicationList
+from .forms import BeneficiaryForm, PaymentListForm, NewBeneficiaryForm, PaymentListBeneficiaryForm, UploadFileForm, ApplicationForm, PaymentListBulkEditForm, PaymentListBeneficiaryFormSet
 from django.db.models import Q # type: ignore
 from django.core.paginator import Paginator  # type: ignore # Import Paginator
 from django.contrib.auth.decorators import login_required # type: ignore
@@ -12,6 +12,7 @@ from django.http import HttpResponse # type: ignore
 from io import BytesIO
 from django.contrib import messages # type: ignore
 from django.db import transaction, IntegrityError # type: ignore
+from .tables import PaymentListBeneficiaryTable
 
 def index(request): #zdefiniowanie strony index
     return render(request, 'frontend/index.html')
@@ -54,20 +55,7 @@ def beneficiary_detail(request, pk):
     payment_history = PaymentHistory.objects.filter(beneficiary=beneficiary)
     return render(request, 'frontend/beneficiary_detail.html', {'beneficiary': beneficiary, 'payment_history': payment_history})
 
-
-
 @login_required
-#def payment_add(request):
-#    if request.method == 'POST':
-#        form = PaymentListForm(request.POST)
-#        if form.is_valid():
-#            payment_add = form.save()
-#            for beneficiary in form.cleaned_data['Beneficiaries']:
-#                PaymentHistory.objects.create(beneficiary=beneficiary, payment_add=payment_add)
-#            return redirect('frontend:payment_add')
-#    else:
-#        form = PaymentListForm()
-#    return render(request, 'frontend/payment_add.html', {'form': form})
 def payment_add(request):
     if request.method == 'POST':
         form = PaymentListForm(request.POST)
@@ -209,8 +197,8 @@ def import_beneficiaries(request):
             return redirect('frontend:beneficiary_list')
     else:
         form = UploadFileForm()
-
     return render(request, 'frontend/import_beneficiaries.html', {'form': form})
+
 @login_required
 def beneficiary_edit(request, pk):
     beneficiary = get_object_or_404(Beneficiary, pk=pk)
@@ -232,4 +220,74 @@ def beneficiary_edit(request, pk):
         form.fields['version'].initial = beneficiary.version
     
     return render(request, 'frontend/beneficiary_edit.html', {'form': form, 'beneficiary': beneficiary})
-# Create your views here.
+
+def beneficiary_list_full(request):
+    query = request.GET.get('q')
+    if query:
+        beneficiaries = Beneficiary.objects.filter(
+            Q(first_name__icontains=query) | 
+            Q(last_name__icontains=query) | 
+            Q(place__icontains=query)
+        )
+    else:
+        beneficiaries = Beneficiary.objects.all()
+
+    active_count = Beneficiary.objects.filter(is_alive=True).count()
+    inactive_count = Beneficiary.objects.filter(is_alive=False).count()
+    
+    paginator = Paginator(beneficiaries, 50)  # 50 beneficjentów na stronę
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'frontend/beneficiary_list_full.html', {'page_obj': page_obj, 'active_count':active_count, 'inactive_count':inactive_count})
+
+@login_required
+def application_create(request):
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST)
+        if form.is_valid():
+            application = form.save(commit=False)
+            application.save()
+            messages.success(request, 'Application created successfully')
+            return redirect('frontend:application_list_all')
+    else:
+        form = ApplicationForm()
+    return render(request, 'frontend/application_form.html', {'form': form})
+
+@login_required
+def application_list_all(request):
+    applications = Application.objects.all()
+    application_lists = {}
+    for application in applications:
+        key = f"{application.benefit.name} {application.date_submitted.year}"
+        if key not in application_lists:
+            application_lists[key] = {
+                'benefit': application.benefit,
+                'year': application.date_submitted.year,
+                'applications': []
+            }
+        application_lists[key]['applications'].append(application)
+    return render(request, 'frontend/application_list_all.html', {'application_lists': application_lists.values()})
+
+@login_required
+def application_list_detail(request, benefit_id, year):
+    benefit = get_object_or_404(Benefit, id=benefit_id)
+    applications = Application.objects.filter(benefit=benefit, date_submitted__year=year)
+    if request.method == 'POST':
+        selected_applications = request.POST.getlist('applications')
+        payment_list = PaymentList.objects.create(name=f"{benefit.name} {year}")
+        for app_id in selected_applications:
+            application = get_object_or_404(Application, id=app_id)
+            PaymentListBeneficiary.objects.create(
+                payment_list=payment_list,
+                beneficiary=application.beneficiary,
+                amount=application.amount
+            )
+            PaymentHistory.objects.create(
+                beneficiary=application.beneficiary,
+                payment_list=payment_list,
+                amount=application.amount
+            )
+        messages.success(request, 'Lista wypłat utworzona poprawnie!')
+        return redirect('frontend:payment_detail', pk=payment_list.pk)
+    return render(request, 'frontend/application_list_detail.html', {'applications': applications, 'benefit': benefit, 'year': year})

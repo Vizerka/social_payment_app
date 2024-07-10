@@ -1,0 +1,16 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+<h2>{{ application_list.benefit.name }} {{ application_list.year }}</h2>
+<form method="post">
+    {% csrf_token %}
+    <ul>
+        {% for application in applications %}
+        <li>
+            <input type="checkbox" name="applications" value="{{ application.id }}"> {{ application.beneficiary }} - {{ application.benefit }} - {{ application.monthly_income }} - {{ application.household_type }}
+        </li>
+        {% endfor %}
+    </ul>
+    <button type="submit">Zatwierdź</button>
+</form>
+{% endblock %}

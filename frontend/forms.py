@@ -1,6 +1,7 @@
 from django import forms # type: ignore
-from .models import Beneficiary, PaymentList, PaymentListBeneficiary
+from .models import Beneficiary, PaymentList, PaymentListBeneficiary, Application, Benefit
 from django_select2.forms import Select2MultipleWidget, Select2Widget # type: ignore
+from django.forms import inlineformset_factory
 
 class BeneficiaryForm(forms.ModelForm):
     class Meta:
@@ -48,3 +49,35 @@ class NewBeneficiaryForm(forms.ModelForm):
 
 class UploadFileForm(forms.Form):
     file = forms.FileField(label='Wybierz plik Excel')
+
+class ApplicationForm(forms.ModelForm):
+    beneficiary = forms.ModelChoiceField(queryset=Beneficiary.objects.filter(is_alive=True), widget=Select2Widget(attrs={'data-minimum-input-length': 0}))
+    class Meta:
+        model = Application
+        fields = ['beneficiary', 'benefit', 'monthly_income', 'household_type']
+        labels = {'beneficiary': 'beneficjent',
+                  'benefit': 'Świadczenie',
+                  'monthly_income': 'Średni dochód brutto na osobę z ostanich 3 miesięcy',
+                  'household_type':'Typ gospodarstwa domowego:'}
+
+    def __init__(self, *args, **kwargs):
+        super(ApplicationForm, self).__init__(*args, **kwargs)
+        self.fields['benefit'].queryset = Benefit.objects.all()
+
+class PaymentListBulkEditForm(forms.Form):
+    amount = forms.DecimalField(max_digits=10, decimal_places=2)
+    beneficiaries = forms.ModelMultipleChoiceField(queryset=Beneficiary.objects.all())
+
+class PaymentListBeneficiaryForm(forms.ModelForm):
+    class Meta:
+        model = PaymentListBeneficiary
+        fields = ['beneficiary', 'amount']
+
+PaymentListBeneficiaryFormSet = inlineformset_factory(
+    PaymentList, PaymentListBeneficiary, form=PaymentListBeneficiaryForm, extra=0
+)
+
+class PaymentListBeneficiaryForm(forms.ModelForm):
+    class Meta:
+        model = PaymentListBeneficiary
+        fields = ['beneficiary', 'amount']

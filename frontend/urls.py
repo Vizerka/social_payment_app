@@ -15,4 +15,8 @@ urlpatterns = [
     path('payment_detail/<int:pk>/', views.payment_detail, name='payment_detail'),
     path('export_payment_list_to_excel/<int:pk>/', views.export_payment_list_to_excel, name='export_payment_list_to_excel'),
     path('import_beneficiaries/', views.import_beneficiaries, name='import_beneficiaries'),
-]
+    path('beneficiary_list_full', views.beneficiary_list_full, name='beneficiary_list_full'),
+    path('application/create/', views.application_create, name='application_create'),
+    path('application/list/', views.application_list_all, name='application_list_all'),
+    path('application/list/<int:benefit_id>/<int:year>/', views.application_list_detail, name='application_list_detail'),
+   ]

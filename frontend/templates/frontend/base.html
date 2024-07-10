@@ -17,6 +17,8 @@
                 <a href="{% url 'frontend:payment_add' %}">Utwórz liste wypłat</a>
                 <a href="{% url 'frontend:beneficiary_list' %}">Lista beneficjentów</a> 
                 <a href="{% url 'frontend:payment_list_all' %}">Wszystkie listy wypłat</a>
+                <a href="{% url 'frontend:application_create' %}">Dodaj Wniosek</a>
+                <a href="{% url 'frontend:application_list_all' %}">Lista Wniosków</a>
                     {% if user.is_authenticated %}
                     <p>Witaj, {{ user.username }}.</p>
                     {% else %}

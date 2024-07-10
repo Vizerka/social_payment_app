@@ -1,0 +1,14 @@
+{% extends "frontend/base.html" %}
+
+{% block content %}
+<h2>Wszystkie wnioski</h2>
+<ul>
+    {% for application_list in application_lists %}
+    <li>
+        <a href="{% url 'frontend:application_list_detail' application_list.benefit.id application_list.year %}">
+            {{ application_list.benefit.name }} {{ application_list.year }}
+        </a>
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

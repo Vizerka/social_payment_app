@@ -5,6 +5,10 @@
     <h1>{{ beneficiary.first_name }} {{ beneficiary.last_name }}</h1>
     <p>Placówka: {{ beneficiary.place }}</p>
     <p>Nr Konta Bankowego: {{ beneficiary.bank_account_number }}</p>
+    <p>data urodzenia: {{ beneficiary.birth_date }}</p>
+    <p>Adres: {{ beneficiary.place_of_residence }}</p>
+    <p>Numer tel: {{ beneficiary.phone_num }}
+    </p>
     {% if beneficiary.is_alive %}</p>
     <p>Beneficjent aktywny</p>
     {% else %}

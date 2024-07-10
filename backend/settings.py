@@ -39,6 +39,8 @@ INSTALLED_APPS = [
     #aplikacje zewnętrzene 
     'django_select2',
     'simple_history',
+    'django_tables2',
+    'bootstrap_modal_forms',
     #domyślne aplikacje django 
     'django.contrib.admin',
     'django.contrib.auth',
