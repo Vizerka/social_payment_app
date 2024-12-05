@@ -17,6 +17,9 @@ from .tables import PaymentListBeneficiaryTable
 def index(request): #zdefiniowanie strony index
     return render(request, 'frontend/index.html')
 
+
+
+#Widoki dotyczące beneficjentów 
 @login_required
 def beneficiary_list(request):
     query = request.GET.get('q')
@@ -54,6 +57,89 @@ def beneficiary_detail(request, pk):
     beneficiary = get_object_or_404(Beneficiary, pk=pk)
     payment_history = PaymentHistory.objects.filter(beneficiary=beneficiary)
     return render(request, 'frontend/beneficiary_detail.html', {'beneficiary': beneficiary, 'payment_history': payment_history})
+
+@login_required
+def import_beneficiaries(request):
+    if request.method == 'POST':
+        form = UploadFileForm(request.POST, request.FILES)
+        if form.is_valid():
+            file = request.FILES['file']
+            wb = openpyxl.load_workbook(file)
+            sheet = wb.active
+            skipped_beneficiaries = []
+
+            for row in sheet.iter_rows(min_row=2, values_only=True):
+                first_name, last_name, place, bank_account_number = row
+                if Beneficiary.objects.filter(first_name=first_name, last_name=last_name, place=place).exists():
+                    skipped_beneficiaries.append(f'{first_name} {last_name} ({place})')
+                    continue
+
+                Beneficiary.objects.create(
+                    first_name=first_name,
+                    last_name=last_name,
+                    place=place,
+                    bank_account_number=bank_account_number,)
+
+            if skipped_beneficiaries:
+                messages.warning(request, f'Import przebiegł pomyślnie, pominięci zostali następujący beneficjenci: {", ".join(skipped_beneficiaries)}')
+            else:
+                messages.success(request, 'Pomyślnie zaimportowano wszystkich beneficjentów')
+
+            return redirect('frontend:beneficiary_list')
+    else:
+        form = UploadFileForm()
+    return render(request, 'frontend/import_beneficiaries.html', {'form': form})
+
+@login_required
+def beneficiary_edit(request, pk):
+    beneficiary = get_object_or_404(Beneficiary, pk=pk)
+    
+    if request.method == 'POST':
+        form = BeneficiaryForm(request.POST, instance=beneficiary)
+        if form.is_valid():
+            with transaction.atomic():
+                if Beneficiary.objects.filter(pk=pk, version=form.cleaned_data['version']).exists():
+                    beneficiary = form.save(commit=False)
+                    beneficiary.version += 1
+                    beneficiary.save()
+                    messages.success(request, 'Beneficjent został pomyślnie zaktualizowany.')
+                    return redirect('frontend:beneficiary_detail', pk=beneficiary.pk)
+                else:
+                    form.add_error(None, 'Ten rekord został już zaktualizowany przez innego użytkownika.')
+    else:
+        form = BeneficiaryForm(instance=beneficiary)
+        form.fields['version'].initial = beneficiary.version
+    
+    return render(request, 'frontend/beneficiary_edit.html', {'form': form, 'beneficiary': beneficiary})
+
+def beneficiary_list_full(request):
+    query = request.GET.get('q')
+    if query:
+        beneficiaries = Beneficiary.objects.filter(
+            Q(first_name__icontains=query) | 
+            Q(last_name__icontains=query) | 
+            Q(place__icontains=query)
+        )
+    else:
+        beneficiaries = Beneficiary.objects.all()
+
+    active_count = Beneficiary.objects.filter(is_alive=True).count()
+    inactive_count = Beneficiary.objects.filter(is_alive=False).count()
+    
+    paginator = Paginator(beneficiaries, 50)  # 50 beneficjentów na stronę
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+    
+    return render(request, 'frontend/beneficiary_list_full.html', {'page_obj': page_obj, 'active_count':active_count, 'inactive_count':inactive_count})
+
+
+#Widoki dotyczące wniosków 
+#potrzebuję najpierw stworzyć model wniosku, wniosek musi być dodawany do 
+
+
+
+
+
 
 @login_required
 def payment_add(request):
@@ -166,80 +252,6 @@ def export_payment_list_to_excel(request, pk):
     response['Content-Disposition'] = f'attachment; filename={payment_list.name}.xlsx'
 
     return response
-
-@login_required
-def import_beneficiaries(request):
-    if request.method == 'POST':
-        form = UploadFileForm(request.POST, request.FILES)
-        if form.is_valid():
-            file = request.FILES['file']
-            wb = openpyxl.load_workbook(file)
-            sheet = wb.active
-            skipped_beneficiaries = []
-
-            for row in sheet.iter_rows(min_row=2, values_only=True):
-                first_name, last_name, place, bank_account_number = row
-                if Beneficiary.objects.filter(first_name=first_name, last_name=last_name, place=place).exists():
-                    skipped_beneficiaries.append(f'{first_name} {last_name} ({place})')
-                    continue
-
-                Beneficiary.objects.create(
-                    first_name=first_name,
-                    last_name=last_name,
-                    place=place,
-                    bank_account_number=bank_account_number,)
-
-            if skipped_beneficiaries:
-                messages.warning(request, f'Import przebiegł pomyślnie, pominięci zostali następujący beneficjenci: {", ".join(skipped_beneficiaries)}')
-            else:
-                messages.success(request, 'Pomyślnie zaimportowano wszystkich beneficjentów')
-
-            return redirect('frontend:beneficiary_list')
-    else:
-        form = UploadFileForm()
-    return render(request, 'frontend/import_beneficiaries.html', {'form': form})
-
-@login_required
-def beneficiary_edit(request, pk):
-    beneficiary = get_object_or_404(Beneficiary, pk=pk)
-    
-    if request.method == 'POST':
-        form = BeneficiaryForm(request.POST, instance=beneficiary)
-        if form.is_valid():
-            with transaction.atomic():
-                if Beneficiary.objects.filter(pk=pk, version=form.cleaned_data['version']).exists():
-                    beneficiary = form.save(commit=False)
-                    beneficiary.version += 1
-                    beneficiary.save()
-                    messages.success(request, 'Beneficjent został pomyślnie zaktualizowany.')
-                    return redirect('frontend:beneficiary_detail', pk=beneficiary.pk)
-                else:
-                    form.add_error(None, 'Ten rekord został już zaktualizowany przez innego użytkownika.')
-    else:
-        form = BeneficiaryForm(instance=beneficiary)
-        form.fields['version'].initial = beneficiary.version
-    
-    return render(request, 'frontend/beneficiary_edit.html', {'form': form, 'beneficiary': beneficiary})
-
-def beneficiary_list_full(request):
-    query = request.GET.get('q')
-    if query:
-        beneficiaries = Beneficiary.objects.filter(
-            Q(first_name__icontains=query) | 
-            Q(last_name__icontains=query) | 
-            Q(place__icontains=query)
-        )
-    else:
-        beneficiaries = Beneficiary.objects.all()
-
-    active_count = Beneficiary.objects.filter(is_alive=True).count()
-    inactive_count = Beneficiary.objects.filter(is_alive=False).count()
-    
-    paginator = Paginator(beneficiaries, 50)  # 50 beneficjentów na stronę
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
-    
-    return render(request, 'frontend/beneficiary_list_full.html', {'page_obj': page_obj, 'active_count':active_count, 'inactive_count':inactive_count})
 
 @login_required
 def application_create(request):

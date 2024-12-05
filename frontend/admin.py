@@ -8,5 +8,6 @@ admin.site.register(Beneficiary, SimpleHistoryAdmin)
 admin.site.register(Benefit)
 admin.site.register(ApplicationList)
 admin.site.register(Application)
+admin.site.register(PaymentListBeneficiary)
 
 # Register your models here.
