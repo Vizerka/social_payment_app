@@ -89,14 +89,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'mssql',
-        'NAME': 'CUWO_SOCJALNY',
+        'NAME': 'TESTOWA123',
         'USER': 'sa',
-        'PASSWORD': 'Test123',
-        'HOST': 'localhost\SQLEXPRESS',
-        'PORT': '',
-        'OPTIONS':{
+        'PASSWORD': 'Testowa123',
+        'HOST': r'CUWO-K-3240\TESTOWA123',  # Ensure the backslash is escaped
+        'PORT': '',  # Default port is 1433
+        'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
-            #'Trusted_Connection': 'yes',
         },
     }
 }
@@ -147,4 +146,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 #moje ustawienia
 LOGIN_REDIRECT_URL = 'frontend:index'
 LOGOUT_REDIRECT_URL = 'frontend:index'
-
